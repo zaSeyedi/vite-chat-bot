@@ -7,7 +7,9 @@ type MessageInfo = {
 const Message = ({ text }: MessageInfo) => {
     return (
         <div className="">
-            <p className="">{text}</p>
+            <div className="">
+                {text}
+            </div>
 
         </div>
     );
