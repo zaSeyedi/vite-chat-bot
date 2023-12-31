@@ -10,7 +10,7 @@ const LoginPage: React.FC<IProps> = () => {
         <ContainerLayout>
             <Link
                 className='cursor-pointer font-bold text-md bg-slate-300 flex w-1/2 mt-20 mx-auto p-3 rounded-md justify-center items-center'
-                to={`/bots`}
+                to={`http://78.157.46.108:8080/user/ssoLogin`}
                 onClick={() => console.log('link click')}>
                 ورود به درگاه یکپارچه دناپ
             </Link>
