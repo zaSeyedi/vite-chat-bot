@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Children } from 'react';
+import React from 'react';
 
 interface IProps {
     children: JSX.Element
