@@ -7,6 +7,7 @@ import BotDetails from './pages/botDetails/botDetailsPage.tsx';
 import ChatPage from './pages/chatPage/index.tsx';
 import LoginPage from './pages/login/loginPage.tsx';
 import BotsListPage from './pages/botsList/botsListPage.tsx';
+import Test from './pages/test/test.tsx';
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,11 @@ const router = createBrowserRouter([
   {
     path: "/bots",
     element: <BotsListPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/test",
+    element: <Test />,
     errorElement: <ErrorPage />,
   },
   {
