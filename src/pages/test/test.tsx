@@ -1,11 +1,10 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import axios from "axios";
 
 interface IProps {
 }
 const Test: React.FC<IProps> = () => {
-    const [url, setUrl] = useState('');
 
     useEffect(() => {
         getUrl()
@@ -20,7 +19,7 @@ const Test: React.FC<IProps> = () => {
 
     return (
         <div>
-            <a href={url}>Google Link</a>
+            <a href={''}>Google Link</a>
         </div>
     );
 }

@@ -1,7 +1,5 @@
 import React from 'react';
 import ContainerLayout from '../../layout/containerLayout';
-import { Link } from "react-router-dom";
-import { useEffect, useState } from 'react';
 import axios from "axios";
 
 interface IProps {
