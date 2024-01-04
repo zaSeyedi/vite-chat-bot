@@ -8,7 +8,9 @@ import ContainerLayout from '../../layout/containerLayout';
 import ChatHeader from './chatHeader';
 import { getTime } from '../../helpers/getDateAndTime';
 
-const socket = io('http://78.157.46.108:3001');
+const socket = io('http://78.157.46.108:3001', {
+  autoConnect: false
+});
 type MessageInfo = {
   _id: string;
   startStepId: string;
@@ -24,6 +26,8 @@ type LastMessageInfo = {
 function ChatPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [messageText, setMessageText] = useState('');
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [init, setInit] = useState(socket.connected);
   const [lastMessageInfo, setLastMessageInfo] = useState<LastMessageInfo>();
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -31,14 +35,38 @@ function ChatPage() {
   const messagesEndRef = useRef<any>(null)
   let urlElements = window.location.pathname.split('/')
 
+
+  useEffect(() => {
+    socket.connect()
+    function onConnect() {
+      console.log('connected')
+      setIsConnected(true);
+      setInit(true)
+    }
+
+    function onDisconnect() {
+      console.log('disconnect')
+      setIsConnected(false);
+    }
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.disconnect()
+    };
+  }, []);
+
+
   useEffect(() => {
     setupMessageEvent(messages)
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages]);
 
   function setupMessageEvent(all: any) {
-
-    socket.on('resultNextStep', (msg) => {
+    socket?.on('resultNextStep', (msg: any) => {
       setMessages([...all, msg] as any);
       setLastMessageInfo({ id: msg._id, numeric: msg.numericKeyboard })
       setTimeout(() => {
@@ -51,21 +79,24 @@ function ChatPage() {
   }
 
   useEffect(() => {
-    axios.get(`http://78.157.46.108:8080/bot/view/${urlElements[2]}`).then((data) => {
-      setPost(data.data.data);
-    });
-  }, []);
+    if (init) {
+      axios.get(`http://78.157.46.108:8080/bot/view/${urlElements[2]}`).then((data) => {
+        setPost(data.data.data);
+      });
+    }
+  }, [init]);
 
   useEffect(() => {
-    if (post) {
+    if (post && socket) {
       startMessage(post);
     }
-  }, [post]);
+  }, [socket, post]);
 
 
   const startMessage = (data: any) => {
     setLoading(true)
-    socket.emit('nextStep', {
+    console.log('inited', socket)
+    socket?.emit('nextStep', {
       "userId": data?.createdById._id,
       "botId": data?._id,
       "stepId": data?.startStepId,
