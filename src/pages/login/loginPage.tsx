@@ -1,7 +1,6 @@
 import React from 'react';
 import ContainerLayout from '../../layout/containerLayout';
 import { Link } from "react-router-dom";
-import axios from "axios";
 
 interface IProps {
 }

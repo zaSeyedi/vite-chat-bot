@@ -26,7 +26,7 @@ type LastMessageInfo = {
 function ChatPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [messageText, setMessageText] = useState('');
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  // const [isConnected, setIsConnected] = useState(socket.connected);
   const [init, setInit] = useState(socket.connected);
   const [lastMessageInfo, setLastMessageInfo] = useState<LastMessageInfo>();
   const [loading, setLoading] = useState(false);
@@ -40,13 +40,13 @@ function ChatPage() {
     socket.connect()
     function onConnect() {
       console.log('connected')
-      setIsConnected(true);
+      // setIsConnected(true);
       setInit(true)
     }
 
     function onDisconnect() {
       console.log('disconnect')
-      setIsConnected(false);
+      // setIsConnected(false);
     }
 
     socket.on('connect', onConnect);
