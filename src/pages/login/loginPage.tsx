@@ -1,6 +1,6 @@
 import React from 'react';
 import ContainerLayout from '../../layout/containerLayout';
-import { Link, redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import axios from "axios";
 
