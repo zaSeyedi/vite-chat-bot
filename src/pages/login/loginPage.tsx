@@ -1,6 +1,6 @@
 import React from 'react';
 import ContainerLayout from '../../layout/containerLayout';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import axios from "axios";
 
@@ -23,23 +23,33 @@ interface userData {
 }
 const LoginPage: React.FC<IProps> = () => {
 
+
     let urlElements = window.location.href.split('?')
+    const navigate = useNavigate();
     const [loginData, setLoginData] = useState<userData>()
-    console.log(localStorage)
-    const localStorageToken = JSON.parse(localStorage.getItem('token') as any)
-    console.log(localStorageToken)
+    const [token, setToken] = useState('')
+
 
     useEffect(() => {
         let urlElements = window.location.href.split('?')
-        console.log("code:" + urlElements[1])
-        console.log('url' + urlElements[0])
-        if(urlElements[1]){
+        if (urlElements[1]) {
             handleSSOLogin(urlElements[1])
         }
     }, [urlElements[1]]);
 
+    useEffect(() => {
+        const localStorageToken = localStorage.getItem('token') as any
+        const localStorageUserData = localStorage.getItem('studentData') as any
+        if (localStorageUserData) {
+            setLoginData(JSON.parse(localStorageUserData))
+        }
+        if (localStorageToken) {
+            setToken(localStorageToken)
+        }
+
+    }, []);
+
     const handleSSOLogin = async (token: string) => {
-        localStorage.setItem('token', JSON.stringify(token))
         try {
             const response = await axios.get('http://78.157.46.108:8080/user/profile',
                 {
@@ -47,10 +57,14 @@ const LoginPage: React.FC<IProps> = () => {
                         "x-token": token
                     }
                 });
-            console.log(response.data)
-            localStorage.setItem('studentData', JSON.stringify(response.data.data))
-            setLoginData(response.data.data)
-            
+            if (response && response.data.code === 0) {
+                setLoginData(response.data.data)
+                setToken(token)
+                localStorage.setItem('studentData', JSON.stringify(response.data.data))
+                localStorage.setItem('token', token)
+                navigate("/", { replace: true })
+            }
+
         } catch (error) {
             console.error('Error during SSO login:', error);
         }
@@ -59,24 +73,32 @@ const LoginPage: React.FC<IProps> = () => {
     return (
         <ContainerLayout>
             <div>
-                {!localStorageToken &&
+                {!token &&
                     <Link
                         className='cursor-pointer font-bold text-md bg-slate-300 flex w-1/2 mt-20 mx-auto p-3 rounded-md justify-center items-center'
                         to={`http://78.157.46.108:8080/user/ssoLogin`}
-                        onClick={() => handleSSOLogin(urlElements[1])}
                     >
                         ورود به درگاه یکپارچه دناپ
                     </Link>}
-                {localStorageToken &&
+                {token &&
                     <div className='p-3'>{loginData?.role.name}خوش آمدید</div>}
 
                 <Link
                     className='cursor-pointer font-bold text-md bg-slate-300 flex w-1/2 mt-20 mx-auto p-3 rounded-md justify-center items-center'
                     to={`/bots`}
-                // onClick={() => console.log(loginData)}
                 >
                     ورود به بات ها
                 </Link>
+                {token &&
+                    <button
+                        className='cursor-pointer font-bold text-md bg-slate-300 flex w-1/2 mt-20 mx-auto p-3 rounded-md justify-center items-center'
+                        onClick={() => {
+                            localStorage.removeItem('token')
+                            setToken('')
+                        }}
+                    >
+                        خروج
+                    </button>}
             </div>
 
         </ContainerLayout>
