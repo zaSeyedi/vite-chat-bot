@@ -7,6 +7,7 @@ import '../../styles/loading.css'
 import ContainerLayout from '../../layout/containerLayout';
 import ChatHeader from './chatHeader';
 import { getTime } from '../../helpers/getDateAndTime';
+import { useNavigate } from 'react-router-dom';
 
 const socket = io('http://78.157.46.108:3001', {
   autoConnect: false
@@ -26,7 +27,6 @@ type LastMessageInfo = {
 function ChatPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [messageText, setMessageText] = useState('');
-  // const [isConnected, setIsConnected] = useState(socket.connected);
   const [init, setInit] = useState(socket.connected);
   const [lastMessageInfo, setLastMessageInfo] = useState<LastMessageInfo>();
   const [loading, setLoading] = useState(false);
@@ -34,6 +34,7 @@ function ChatPage() {
   const [post, setPost] = useState<MessageInfo | null>(null);
   const messagesEndRef = useRef<any>(null)
   let urlElements = window.location.pathname.split('/')
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -73,8 +74,9 @@ function ChatPage() {
         setIsTyping(msg.type === "Message" && msg.isLast === false)
       }, 1000);
       setIsTyping(msg.createdById === "student")
-      console.log(msg)
+
     });
+    console.log(messages)
     setLoading(false)
   }
 
@@ -106,23 +108,28 @@ function ChatPage() {
     setPost(data);
 
   };
-  const sendMessage = () => {
+  const sendMessage = (message: string) => {
+    console.log(messageText)
     setIsTyping(true)
-    setMessages([...messages, { text: messageText, createdById: 'student', createdAt: new Date() }] as any);
+    setMessages([...messages, { text: message, createdById: 'student', createdAt: new Date() }] as any);
     socket.emit('nextStep', {
       "userId": post?.createdById._id,
       "botId": post?._id,
       "stepId": lastMessageInfo?.id,
       "goToNext": 1,
-      "answers": messageText
+      "answers": message
     });
     setMessageText('');
   };
 
+  const optionSelected = (option: any) => {
+    sendMessage(option)
+  }
+
   return (
     <ContainerLayout>
       <div className='h-full flex flex-col justify-between pb-6'>
-        <ChatHeader onclick={() => socket.close()} />
+        <ChatHeader onclick={() => navigate(-1)} />
         <div className='flex flex-col overflow-y-scroll flex-1'>
           <div className='overflow-y-scroll h-screen'>
             <div
@@ -138,6 +145,15 @@ function ChatPage() {
                     />
                   </div>
                   <div className='text-xs'>{getTime(message.createdAt)}</div>
+                  {index === messages.length - 1 && (message.type === "SingleChoice" || message.type === "MultipleChoice" )&&
+                    message.options.map((option: any) => (
+                      <div
+                        className='flex flex-col border p-3 w-fit min-w-20 self-start items-center cursor-pointer ml-10 mb-2'
+                        onClick={() => optionSelected(option)}>
+                        {option}
+                      </div>
+                    ))
+                  }
                 </div>
 
               ))}
@@ -160,7 +176,7 @@ function ChatPage() {
             onChange={(e) => setMessageText(e.target.value)}
             placeholder="Type your message..."
           />
-          <button className='ml-4 text-lg font-semibold text-blue-500' onClick={sendMessage}>Send</button>
+          <button className='ml-4 text-lg font-semibold text-blue-500' onClick={() => sendMessage(messageText)}>Send</button>
         </div>
       </div>
 

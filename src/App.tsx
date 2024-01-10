@@ -40,7 +40,6 @@ const router = createBrowserRouter([
 ]);
 
 const App = () => {
-  console.log('here')
   return (
     // <Router>
     //   <Routes>

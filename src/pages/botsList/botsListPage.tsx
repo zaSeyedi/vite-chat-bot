@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 interface IProps {
 }
 const BotsListPage: React.FC<IProps> = () => {
+    
 
     return (
         <ContainerLayout>
@@ -20,6 +21,12 @@ const BotsListPage: React.FC<IProps> = () => {
                     to={`/bots/تست`}
                     onClick={() => console.log('link click')}>
                     بات ۲
+                </Link>
+                <Link
+                    className='cursor-pointer font-bold text-md bg-slate-300 flex w-1/2 mt-20 mx-auto p-3 rounded-md justify-center items-center'
+                    to={`/bots/659ace00d08e88d66bcbcdf5`}
+                    onClick={() => console.log('link click')}>
+                    بات ۳
                 </Link>
             </div>
         </ContainerLayout>
